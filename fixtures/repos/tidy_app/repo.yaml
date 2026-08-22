@@ -1,0 +1,3 @@
+# Fixture repo manifest: an already-migrated checkout with no breaking changes.
+repo_id: tidy-app
+framework: flask

@@ -1,0 +1,29 @@
+# Breaking-change pack: legacy requests usage -> modern requests.
+#
+# Configuration, not code. Same schema as the flask pack; the loader refuses stray keys.
+framework: requests
+version: "1.0"
+source:
+  id: requests-migration-notes
+  title: "requests migration notes (synthetic)"
+rules:
+  - id: REQ-DEP-SESSION
+    kind: deprecated_call
+    target: requests.session
+    severity: medium
+    message: "the lowercase requests.session factory is deprecated"
+    replacement: requests.Session
+
+  - id: REQ-DEP-PACKAGES
+    kind: deprecated_call
+    target: requests.packages
+    severity: high
+    message: "the vendored requests.packages.* shim was removed; import the package directly"
+    replacement: the vendored package's own top-level import
+
+  - id: REQ-SEMVER
+    kind: semver_window
+    package: requests
+    min_version: "2.20"
+    severity: high
+    message: "this migration targets requests >= 2.20"

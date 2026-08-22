@@ -1,0 +1,3 @@
+# Fixture repo manifest: a deliberately cyclic checkout to prove the plan refuses an unsafe order.
+repo_id: tangled-service
+framework: requests

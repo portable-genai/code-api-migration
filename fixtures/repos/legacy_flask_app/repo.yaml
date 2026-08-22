@@ -1,0 +1,3 @@
+# Fixture repo manifest: which synthetic checkout this is and which pack applies.
+repo_id: legacy-flask-app
+framework: flask

@@ -1,0 +1,8 @@
+{
+  "locals": {
+    "render_region": "asia-southeast1",
+    "render_package_name": "code_api_migration",
+    "render_env_prefix": "CODEMIGRATION",
+    "render_catalog_id": "H5"
+  }
+}

@@ -1,0 +1,41 @@
+# Breaking-change pack: Flask 1.x -> 2.x migration.
+#
+# Configuration, not code. Each rule is one falsifiable machine rule the deterministic engine
+# evaluates against the AST facts; the loader (domain/pack_loader.py) refuses any unknown field.
+# Citations point at the (synthetic) migration note the finding is grounded in. Obviously
+# fictional source ids only.
+framework: flask
+version: "1.0"
+source:
+  id: flask-2x-migration-notes
+  title: "Flask 2.x migration notes (synthetic)"
+rules:
+  - id: FLASK-DEP-JSONIFY
+    kind: deprecated_call
+    target: flask.json.jsonify
+    severity: medium
+    message: "flask.json.jsonify was removed in Flask 2.x"
+    replacement: flask.jsonify
+
+  - id: FLASK-DEP-EXT-IMPORT
+    kind: deprecated_call
+    target: flask.ext
+    severity: high
+    message: "the flask.ext.* import shim was removed; import the extension package directly"
+    replacement: the extension's own package
+
+  - id: FLASK-SIG-RUN
+    kind: signature_change
+    target: app.run
+    old_arity: 2
+    new_arity: 0
+    severity: high
+    message: "Flask.run no longer accepts positional host and port; pass them as keywords"
+    replacement: "app.run(host=..., port=...)"
+
+  - id: FLASK-SEMVER
+    kind: semver_window
+    package: flask
+    min_version: "2.0"
+    severity: high
+    message: "this migration targets Flask >= 2.0"
