@@ -143,7 +143,7 @@ wired in this tree today, and what is honestly not (the authority is the R1 to R
 
 | Concern | Owner | Wired here? |
 |---|---|---|
-| Human review and maker-checker console | **Hrz7** | **Yes.** `ports/review_router.py` with an adapter in every family, over the shared `review-kit`. Set `HRZ_HUMAN_REVIEW_URL`; the managed router REFUSES rather than swallowing an escalation when it is empty. |
+| Human review and maker-checker console | **Hrz7** | **Yes.** `ports/review_router.py` with an adapter in every family, over the shared `review-kit`. Set `HUMAN_REVIEW_URL`; the managed router REFUSES rather than swallowing an escalation when it is empty. |
 | AI-quality and promotion gate | **Hrz4** | **Client half only.** `adapters/gcp/evaluation.py` asks the Hrz4 authority (`CODEMIGRATION_QUALITY_URL`) under bundle `code-api-migration` and refuses to run off the managed profile. You must still REGISTER that bundle and its thresholds with Hrz4, or gate mode has no authority to ask. |
 | Observability, tracing and immutable audit | **Hrz5** | **Tracing half only.** `adapters/gcp/tracer.py` exports OTLP to the Hrz5 collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. The audit trail is local and tamper-evident (hash chain plus external anchor); binding it to the shared sink is still open. |
 | Agent registry, identity and entitlements | **Hrz3** | **Card only.** The A2A card is served at `/.well-known/agent-card.json` and built from the same tool table the runtime binds. Registering it with Hrz3 and taking entitlements from it is yours. |

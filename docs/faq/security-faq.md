@@ -65,7 +65,7 @@ a placeholder. That refusal is the mechanism that stops "production ready" becom
 No secret value is committed. `config/settings.yaml` and `.env.example` carry variable NAMES and
 non-secret defaults; `.env.secrets.example` carries placeholders. Inbound and outbound credentials
 are deliberately distinct variables: this service's own inbound `CODEMIGRATION_S2S_TOKEN` is not
-the outbound `HRZ7_S2S_TOKEN` it presents to the review console.
+the outbound `HUMAN_REVIEW_S2S_TOKEN` it presents to the review console.
 
 ## What is the supply-chain posture?
 
