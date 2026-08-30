@@ -51,6 +51,7 @@ google-api-core==2.34.0
     #   google-cloud-appengine-logging
     #   google-cloud-core
     #   google-cloud-logging
+    #   google-cloud-source-context
 google-auth==2.57.0
     # via
     #   code-api-migration (pyproject.toml)
@@ -58,6 +59,7 @@ google-auth==2.57.0
     #   google-cloud-appengine-logging
     #   google-cloud-core
     #   google-cloud-logging
+    #   google-cloud-source-context
 google-cloud-appengine-logging==1.10.0
     # via google-cloud-logging
 google-cloud-audit-log==0.6.2
@@ -65,6 +67,8 @@ google-cloud-audit-log==0.6.2
 google-cloud-core==2.7.0
     # via google-cloud-logging
 google-cloud-logging==3.16.3
+    # via code-api-migration (pyproject.toml)
+google-cloud-source-context==1.11.0
     # via code-api-migration (pyproject.toml)
 googleapis-common-protos==1.75.2
     # via
@@ -79,6 +83,7 @@ grpcio==1.83.1
     #   google-api-core
     #   google-cloud-appengine-logging
     #   google-cloud-logging
+    #   google-cloud-source-context
     #   googleapis-common-protos
     #   grpc-google-iam-v1
     #   grpcio-status
@@ -108,12 +113,14 @@ proto-plus==1.28.4
     #   google-api-core
     #   google-cloud-appengine-logging
     #   google-cloud-logging
+    #   google-cloud-source-context
 protobuf==7.36.0
     # via
     #   google-api-core
     #   google-cloud-appengine-logging
     #   google-cloud-audit-log
     #   google-cloud-logging
+    #   google-cloud-source-context
     #   googleapis-common-protos
     #   grpc-google-iam-v1
     #   grpcio-status
