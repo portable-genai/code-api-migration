@@ -37,6 +37,7 @@ from code_api_migration.config import (
 from code_api_migration.domain.migration_service import (
     MigrationService,
 )
+from code_api_migration.packs import pack_resolver
 
 from .canonical import CANONICAL_CALLS, CANONICAL_RESULT
 from tests.conftest import local_settings
@@ -132,15 +133,15 @@ def test_the_payload_that_reaches_the_wire_is_redacted_whichever_family_built_it
 # --------------------------------------------------------------------------- #
 def test_the_whole_pipeline_answers_on_local_and_fails_fast_on_onprem() -> None:
     local = build_container(local_settings())
-    result, _plan = MigrationService(local.audit, tracer=local.tracer).run(
-        sample_cases.ESCALATING_CHECKOUT, actor=sample_cases.ACTOR
-    )
+    result, _plan = MigrationService(
+        local.audit, tracer=local.tracer, resolve_pack=pack_resolver()
+    ).run(sample_cases.ESCALATING_CHECKOUT, actor=sample_cases.ACTOR)
     assert result.requires_human_review is True
     assert result.citations, "an offline answer must still be cited"
     assert local.review_router.route(result, maker=sample_cases.ACTOR)
 
     onprem = build_container(local_settings(profile="onprem"))
     with pytest.raises(NotImplementedError):
-        MigrationService(onprem.audit, tracer=onprem.tracer).run(
+        MigrationService(onprem.audit, tracer=onprem.tracer, resolve_pack=pack_resolver()).run(
             sample_cases.ESCALATING_CHECKOUT, actor=sample_cases.ACTOR
         )

@@ -30,6 +30,7 @@ from code_api_migration.config import (
 from code_api_migration.domain.migration_service import (
     MigrationService,
 )
+from code_api_migration.packs import pack_resolver
 
 from tests.fixtures import sample_cases
 
@@ -53,7 +54,7 @@ def _record_three(settings: Settings) -> LocalAuditAdapter:
     container = build_container(settings)
     audit = container.audit
     assert isinstance(audit, LocalAuditAdapter)
-    service = MigrationService(audit, tracer=container.tracer)
+    service = MigrationService(audit, tracer=container.tracer, resolve_pack=pack_resolver())
     for checkout in (
         sample_cases.ESCALATING_CHECKOUT,
         sample_cases.ROUTINE_CHECKOUT,
@@ -110,9 +111,9 @@ def test_an_append_after_truncation_cannot_relaunder_the_anchor(tmp_path: Path) 
     _truncate_tail(audit)
 
     with pytest.raises(AuditChainError):
-        MigrationService(audit, tracer=build_container(settings).tracer).run(
-            sample_cases.ESCALATING_CHECKOUT, actor=sample_cases.ACTOR
-        )
+        MigrationService(
+            audit, tracer=build_container(settings).tracer, resolve_pack=pack_resolver()
+        ).run(sample_cases.ESCALATING_CHECKOUT, actor=sample_cases.ACTOR)
     assert Path(settings.audit_anchor_path).read_text(encoding="utf-8") == anchored_before
 
 

@@ -39,6 +39,7 @@ from code_api_migration.domain.models import (
     RepoCheckout,
     SourceFile,
 )
+from code_api_migration.packs import pack_resolver
 
 from tests.fixtures import sample_cases
 
@@ -49,7 +50,9 @@ def _settings(profile: str = "local") -> Settings:
 
 def _run(checkout: RepoCheckout) -> MigrationResult:
     container = build_container(_settings())
-    service = MigrationService(container.audit, tracer=container.tracer)
+    service = MigrationService(
+        container.audit, tracer=container.tracer, resolve_pack=pack_resolver()
+    )
     result, _plan = service.run(checkout, actor=sample_cases.ACTOR)
     return result
 

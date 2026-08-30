@@ -44,6 +44,7 @@ from code_api_migration.domain.pii import (
 from code_api_migration.domain.plan_engine import (
     plan_is_complete,
 )
+from code_api_migration.packs import pack_resolver
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 DEFAULT_DATASET = _REPO_ROOT / "eval" / "datasets" / "golden_cases.jsonl"
@@ -92,7 +93,7 @@ def run_smoke(dataset: Path) -> EvalReport:
     settings = Settings(profile="local", audit_path=":memory:")
     audit = LocalAuditAdapter(settings)
     tracer = LocalNoopTracerAdapter(settings)
-    service = MigrationService(audit, tracer=tracer, packs_dir=_PACKS_DIR)
+    service = MigrationService(audit, tracer=tracer, resolve_pack=pack_resolver(_PACKS_DIR))
 
     detection_scores: list[float] = []
     completeness_scores: list[float] = []

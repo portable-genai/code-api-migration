@@ -24,6 +24,7 @@ from pii_kit import redact
 from ..config import Container, Settings, build_container
 from ..domain.migration_service import MigrationService
 from ..domain.pii import PII_PATTERNS
+from ..packs import pack_resolver
 
 if TYPE_CHECKING:  # pragma: no cover - typing only, never imported at runtime
     from google.adk.tools import FunctionTool
@@ -82,7 +83,9 @@ def analyze_migration(
     """
     container = _container(settings)
     checkout = container.repo_scanner.scan(repo_id)
-    service = MigrationService(container.audit, tracer=container.tracer)
+    service = MigrationService(
+        container.audit, tracer=container.tracer, resolve_pack=pack_resolver()
+    )
     result, _plan = service.run(checkout, actor=actor)
     review_ref = ""
     if result.requires_human_review:

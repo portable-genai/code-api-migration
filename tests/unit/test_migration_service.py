@@ -23,6 +23,7 @@ from code_api_migration.domain.kernel import (
 from code_api_migration.domain.migration_service import (
     MigrationService,
 )
+from code_api_migration.packs import pack_resolver
 
 from tests.fixtures import sample_cases
 
@@ -30,7 +31,9 @@ from tests.fixtures import sample_cases
 def _service() -> tuple[MigrationService, LocalAuditAdapter]:
     settings = Settings(profile="local", audit_path=":memory:")
     audit = LocalAuditAdapter(settings)
-    return MigrationService(audit, tracer=LocalNoopTracerAdapter(settings)), audit
+    return MigrationService(
+        audit, tracer=LocalNoopTracerAdapter(settings), resolve_pack=pack_resolver()
+    ), audit
 
 
 def test_a_breaking_change_escalates_with_a_high_band() -> None:

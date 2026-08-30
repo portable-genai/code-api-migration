@@ -16,8 +16,6 @@ Hrz7 through the review port (rule R8).
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from pii_kit import redact
 
 from ..ports.audit import AuditSinkPort
@@ -33,7 +31,7 @@ from .models import (
     RepoCheckout,
     RuleStatus,
 )
-from .pack_loader import load_packs_for
+from .pack_loader import PackResolver
 from .pii import PII_PATTERNS
 from .plan_engine import build_plan
 
@@ -52,12 +50,14 @@ _MAX_CITATIONS = 8
 _RUN_SPAN = "migration.run"
 
 
-def analyze(checkout: RepoCheckout, *, packs_dir: Path | None = None) -> MigrationPlan:
+def analyze(checkout: RepoCheckout, *, resolve_pack: PackResolver) -> MigrationPlan:
     """Run the full pure analysis for a checkout and return its migration plan.
 
     Deterministic and model-free: the same checkout and pack yield an identical plan every run.
+    The pack arrives through ``resolve_pack``, so this function reads no filesystem and the
+    determinism above is a property of its inputs rather than of a directory it went looking at.
     """
-    pack = load_packs_for(checkout.framework, packs_dir)
+    pack = resolve_pack(checkout.framework)
     parsed = analyze_files(checkout.files)
     dependency = build_dependency_analysis(parsed)
     findings = evaluate_pack(pack, parsed)
@@ -96,15 +96,15 @@ class MigrationService:
         audit: AuditSinkPort,
         *,
         tracer: ObservabilityTracerPort,
-        packs_dir: Path | None = None,
+        resolve_pack: PackResolver,
     ) -> None:
         self._audit = audit
         self._tracer = tracer
-        self._packs_dir = packs_dir
+        self._resolve_pack = resolve_pack
 
     def plan(self, checkout: RepoCheckout) -> MigrationPlan:
         """The pure analysis, exposed for the plan/finding views without an audit write."""
-        return analyze(checkout, packs_dir=self._packs_dir)
+        return analyze(checkout, resolve_pack=self._resolve_pack)
 
     def run(self, checkout: RepoCheckout, *, actor: str) -> tuple[MigrationResult, MigrationPlan]:
         """Analyse the checkout, record a redacted audit event, and build the routed result.
