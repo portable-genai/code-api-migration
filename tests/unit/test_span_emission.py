@@ -21,6 +21,7 @@ import pytest
 from code_api_migration.config import Settings, build_container
 from code_api_migration.domain.migration_service import MigrationService
 from code_api_migration.domain.models import RepoCheckout
+from code_api_migration.packs import pack_resolver
 
 from tests.fixtures import sample_cases
 
@@ -48,7 +49,7 @@ class _RecordingTracer:
 def _run(checkout: RepoCheckout) -> _RecordingTracer:
     tracer = _RecordingTracer()
     container = build_container(Settings(profile="local", audit_path=":memory:"))
-    service = MigrationService(container.audit, tracer=tracer)  # type: ignore[arg-type]
+    service = MigrationService(container.audit, tracer=tracer, resolve_pack=pack_resolver())  # type: ignore[arg-type]
     service.run(checkout, actor=sample_cases.ACTOR)
     return tracer
 

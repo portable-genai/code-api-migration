@@ -29,17 +29,14 @@ from code_api_migration.domain.dependency_graph import (
 from code_api_migration.domain.kernel import Severity
 from code_api_migration.domain.migration_service import analyze
 from code_api_migration.domain.models import RepoCheckout, RuleStatus, SourceFile
-from code_api_migration.domain.pack_loader import (
-    PackError,
-    available_frameworks,
-    load_packs_for,
-)
+from code_api_migration.domain.pack_loader import PackError
 from code_api_migration.domain.patch_engine import (
     PatchApplyError,
     apply_unified_diff,
     validate_patch,
 )
 from code_api_migration.domain.plan_engine import plan_is_complete
+from code_api_migration.packs import available_frameworks, load_packs_for, pack_resolver
 
 _PACKS = Path("config") / "packs"
 
@@ -190,14 +187,14 @@ def test_an_unknown_framework_is_refused() -> None:
 # --------------------------------------------------------------------------- #
 def test_every_fail_finding_lands_in_exactly_one_step() -> None:
     checkout = load_checkout("legacy_flask_app")
-    plan = analyze(checkout, packs_dir=_PACKS)
+    plan = analyze(checkout, resolve_pack=pack_resolver(_PACKS))
     assert plan.is_blocked is False
     assert plan_is_complete(plan) is True
 
 
 def test_a_cyclic_repo_blocks_the_plan_rather_than_ordering_it() -> None:
     checkout = load_checkout("tangled_service")
-    plan = analyze(checkout, packs_dir=_PACKS)
+    plan = analyze(checkout, resolve_pack=pack_resolver(_PACKS))
     assert plan.is_blocked is True
     assert plan.steps == ()
 

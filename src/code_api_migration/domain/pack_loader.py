@@ -1,10 +1,12 @@
-"""Load and STRICTLY validate the YAML breaking-change packs under ``config/packs/``.
+"""STRICTLY validate breaking-change pack documents into frozen :class:`RulePack` objects.
 
 Packs are configuration, never code (the wave's pack convention, mirrored from the HR copilot's
-entitlement packs). This loader is the boundary between the file on disk and the pure engine: it
-parses the YAML, refuses any unknown field, coerces the typed fields, and hands the engine
-frozen :class:`RulePack` objects. Loading is deterministic (same files -> same packs), so the
-engine downstream stays replayable.
+entitlement packs). Validation is the policy half and lives here: it refuses any unknown field,
+coerces the typed fields, and hands the engine frozen :class:`RulePack` objects. The other half,
+finding a pack file and parsing its YAML, is I/O and lives at the config boundary in
+:mod:`code_api_migration.packs`; this module is handed a document that is already a plain
+mapping. Validation is deterministic (same document -> same pack), so the engine downstream
+stays replayable.
 
 Fail closed: an unknown framework, an unknown rule kind, a missing required field for a kind, or
 any stray key raises at load. A pack that does not validate never reaches the engine, so a
@@ -13,9 +15,8 @@ malformed rule cannot silently degrade into a false PASS.
 
 from __future__ import annotations
 
-from pathlib import Path
-
-import yaml
+from collections.abc import Callable
+from typing import Any
 
 from .breaking_change_engine import Rule, RulePack
 from .kernel import Severity
@@ -29,7 +30,10 @@ _KIND_KEYS: dict[str, frozenset[str]] = {
     "semver_window": frozenset({"package", "min_version"}),
 }
 
-DEFAULT_PACKS_DIR = Path("config") / "packs"
+#: How the core asks for a pack. The boundary supplies one; the core never goes looking.
+#: Taking a resolver rather than a directory is what keeps every filesystem fact outside the
+#: hexagon : a caller with packs in a config map, a database or a fixture satisfies this too.
+PackResolver = Callable[[str], RulePack]
 
 
 class PackError(ValueError):
@@ -77,42 +81,32 @@ def _rule_from(raw: dict[str, object], framework: str, source: dict[str, object]
     )
 
 
-def load_pack(path: Path) -> RulePack:
-    """Load and validate one YAML pack file into a :class:`RulePack`."""
-    data = _require_mapping(yaml.safe_load(path.read_text(encoding="utf-8")) or {}, str(path))
-    _reject_unknown(data, _PACK_KEYS, str(path))
+def build_pack(document: Any, source: str) -> RulePack:
+    """Validate one already-parsed pack document into a :class:`RulePack`.
+
+    ``source`` names where the document came from, so every refusal below points somewhere a
+    reader can open. An empty document is treated as an empty mapping and then refused by the
+    required-field check, rather than being special-cased into a different message.
+    """
+    data = _require_mapping(document or {}, source)
+    _reject_unknown(data, _PACK_KEYS, source)
     for required in _PACK_KEYS:
         if required not in data:
-            raise PackError(f"{path}: pack is missing required field {required!r}")
+            raise PackError(f"{source}: pack is missing required field {required!r}")
     framework = str(data["framework"])
-    source = _require_mapping(data["source"], f"{path}:source")
-    _reject_unknown(source, _SOURCE_KEYS, f"{path}:source")
+    # ``source`` is where the DOCUMENT came from; ``source_block`` is the citation the pack
+    # declares inside itself. Two different things that were one name while the location was
+    # always a path, and are told apart now that the location is a caller-supplied string.
+    source_block = _require_mapping(data["source"], f"{source}:source")
+    _reject_unknown(source_block, _SOURCE_KEYS, f"{source}:source")
     raw_rules = data["rules"]
     if not isinstance(raw_rules, list) or not raw_rules:
-        raise PackError(f"{path}: 'rules' must be a non-empty list")
+        raise PackError(f"{source}: 'rules' must be a non-empty list")
     rules = tuple(
-        _rule_from(_require_mapping(raw, f"{path}:rule[{i}]"), framework, source)
+        _rule_from(_require_mapping(raw, f"{source}:rule[{i}]"), framework, source_block)
         for i, raw in enumerate(raw_rules)
     )
     ids = [rule.id for rule in rules]
     if len(set(ids)) != len(ids):
-        raise PackError(f"{path}: duplicate rule ids in pack")
+        raise PackError(f"{source}: duplicate rule ids in pack")
     return RulePack(framework=framework, version=str(data["version"]), rules=rules)
-
-
-def load_packs_for(framework: str, packs_dir: Path | None = None) -> RulePack:
-    """Load the single pack for a framework, refusing an unknown or missing framework."""
-    root = packs_dir or DEFAULT_PACKS_DIR
-    pack_path = root / framework / "pack.yaml"
-    if not pack_path.is_file():
-        available = sorted(p.name for p in root.iterdir() if p.is_dir()) if root.is_dir() else []
-        raise PackError(f"unknown framework {framework!r}; available packs: {available}")
-    return load_pack(pack_path)
-
-
-def available_frameworks(packs_dir: Path | None = None) -> tuple[str, ...]:
-    """The frameworks with a pack on disk, sorted."""
-    root = packs_dir or DEFAULT_PACKS_DIR
-    if not root.is_dir():
-        return ()
-    return tuple(sorted(p.name for p in root.iterdir() if (p / "pack.yaml").is_file()))

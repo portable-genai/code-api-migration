@@ -60,6 +60,7 @@ from code_api_migration.domain.migration_service import (
 from code_api_migration.domain.pii import (
     JURISDICTIONS,
 )
+from code_api_migration.packs import pack_resolver
 
 
 def loaded_cloud_sdks() -> tuple[str, ...]:
@@ -294,7 +295,9 @@ class DemoRun:
             tenant=TENANT,
         )
         self.container = build_container(self.settings)
-        self.service = MigrationService(self.container.audit, tracer=self.container.tracer)
+        self.service = MigrationService(
+            self.container.audit, tracer=self.container.tracer, resolve_pack=pack_resolver()
+        )
         self.results: list[StepResult] = []
         self.cases = 0
         self.escalated = 0

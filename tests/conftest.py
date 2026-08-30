@@ -29,6 +29,7 @@ from code_api_migration.config import (
 from code_api_migration.domain.migration_service import (
     MigrationService,
 )
+from code_api_migration.packs import pack_resolver
 
 from .fixtures import sample_cases
 
@@ -79,7 +80,7 @@ def container(settings: Settings) -> Container:
 
 @pytest.fixture()
 def migration_service(container: Container) -> MigrationService:
-    return MigrationService(container.audit, tracer=container.tracer)
+    return MigrationService(container.audit, tracer=container.tracer, resolve_pack=pack_resolver())
 
 
 @pytest.fixture()

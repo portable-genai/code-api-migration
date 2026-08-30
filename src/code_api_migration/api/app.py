@@ -82,6 +82,7 @@ from ..domain.migration_service import MigrationService
 # failure rather than a first-request failure (a serving process must not come up on a profile
 # nobody defined).
 from ..managed_readiness import assert_managed_profile_ready
+from ..packs import pack_resolver
 from ..ports.identity import VERIFIED, EndUserAuthUnavailableError
 from .schemas import HealthResponse, MigrationRequestModel, MigrationResponse
 
@@ -289,7 +290,9 @@ def analyze_migration(
     """
     container = _container()
     checkout = container.repo_scanner.scan(request.repo_id)
-    service = MigrationService(container.audit, tracer=container.tracer)
+    service = MigrationService(
+        container.audit, tracer=container.tracer, resolve_pack=pack_resolver()
+    )
     result, plan = service.run(checkout, actor=principal.actor)
     review_ref = ""
     if result.requires_human_review:

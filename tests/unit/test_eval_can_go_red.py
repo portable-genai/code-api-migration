@@ -16,6 +16,7 @@ from agent_eval_kit import assert_can_go_red
 from code_api_migration.domain.migration_service import analyze
 from code_api_migration.domain.models import MigrationPlan, RuleStatus
 from code_api_migration.domain.plan_engine import plan_is_complete
+from code_api_migration.packs import pack_resolver
 
 from tests.unit.test_engines import load_checkout
 
@@ -31,7 +32,7 @@ def _detection_score(found: frozenset[str]) -> float:
 
 
 def test_detection_accuracy_can_go_red() -> None:
-    plan = analyze(load_checkout("legacy_flask_app"), packs_dir=_PACKS)
+    plan = analyze(load_checkout("legacy_flask_app"), resolve_pack=pack_resolver(_PACKS))
     found = frozenset(f.rule_id for f in plan.findings if f.status is RuleStatus.FAIL)
     missed = frozenset(list(found)[:-1])  # the mutant: one seeded breakage goes undetected
     assert_can_go_red(
@@ -48,7 +49,7 @@ def _completeness_score(plan: MigrationPlan) -> float:
 
 
 def test_plan_completeness_can_go_red() -> None:
-    plan = analyze(load_checkout("legacy_flask_app"), packs_dir=_PACKS)
+    plan = analyze(load_checkout("legacy_flask_app"), resolve_pack=pack_resolver(_PACKS))
     # The mutant: a plan that dropped one of its steps, so a FAIL finding lands in no step.
     dropped = dataclasses.replace(plan, steps=plan.steps[:-1])
     assert_can_go_red(

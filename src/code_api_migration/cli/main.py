@@ -9,6 +9,7 @@ from hex_service_kit.logging import configure_logging
 
 from ..config import build_container
 from ..domain.migration_service import MigrationService
+from ..packs import pack_resolver
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -27,7 +28,9 @@ def main(argv: list[str] | None = None) -> int:
 
     if args.command == "analyze":
         checkout = container.repo_scanner.scan(args.repo_id)
-        service = MigrationService(container.audit, tracer=container.tracer)
+        service = MigrationService(
+            container.audit, tracer=container.tracer, resolve_pack=pack_resolver()
+        )
         result, plan = service.run(checkout, actor=args.actor)
         print(f"{result.subject}: {result.severity.value} ({result.decision.value})")
         print(
