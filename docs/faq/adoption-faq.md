@@ -76,7 +76,7 @@ It is guarded twice. A step exists in exactly two places, `demo.STEPS` and `walk
 and `tests/unit/test_demo_surface.py` holds the two sets equal inside `make gate`, so a narrated
 claim nobody verifies cannot exist. The same test then drives the WHOLE arc against the real
 adapters and applies each step's own expectation. On top of that `make demo-selftest` runs the
-real walkthrough headless in the demo-gate workflow. Keep both halves when you add a step, and put
+real walkthrough headless in the hosted check. Keep both halves when you add a step, and put
 the numbers a check reads in the step's `facts` dict rather than only in the rendered prose: a
 check that parses prose breaks on a wording change.
 
