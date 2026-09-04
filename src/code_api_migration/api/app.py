@@ -285,7 +285,8 @@ def analyze_migration(
     The repo is resolved through the scanner port (a bundled fixture under ``local``), the pure
     engines produce every finding, verdict and step, and the model narrates nothing here. Rule
     R8: a result that sets ``requires_human_review`` (any breaking change proposes changes, which
-    is consequential) is ROUTED to the Hrz7 console in the same request that produced it. Setting
+    is consequential) is ROUTED to the human-review-console in the same request that produced it.
+    Setting
     the flag is not the escalation; routing is. The maker is the verified principal.
     """
     container = _container()
