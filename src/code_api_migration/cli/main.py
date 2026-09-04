@@ -19,7 +19,9 @@ def main(argv: list[str] | None = None) -> int:
     analyze_cmd = sub.add_parser("analyze", help="Analyse a target repo's migration.")
     analyze_cmd.add_argument("repo_id", help="The target repo id the scanner resolves.")
     analyze_cmd.add_argument("--actor", default="cli-user@bank.example")
-    analyze_cmd.add_argument("--tenant", default="", help="Tenant partition asserted to Hrz7.")
+    analyze_cmd.add_argument(
+        "--tenant", default="", help="Tenant partition asserted to human-review-console."
+    )
 
     args = parser.parse_args(argv)
     container = build_container()

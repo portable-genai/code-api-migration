@@ -8,7 +8,7 @@ no reason but the length of its name.
 Everything here is a frozen, slotted dataclass or a ``StrEnum`` whose member IS its wire value,
 so the whole analysis is hashable, comparable and replayable. The consequential objects are the
 :class:`Finding` set, the :class:`MigrationPlan` and the :class:`MigrationResult` that routes to
-Hrz7; the model never constructs any of them, it only narrates them.
+human-review-console; the model never constructs any of them, it only narrates them.
 
 A fork building a different vertical rewrites this module and keeps ``kernel.py`` untouched.
 """
@@ -220,7 +220,8 @@ class PullRequestIntent:
 
 @dataclass(frozen=True, slots=True)
 class MigrationResult:
-    """The consequential result routed to Hrz7 (rule R8) when a migration is proposed.
+    """The consequential result routed to human-review-console (rule R8) when a migration is
+    proposed.
 
     It carries the same contract every routed result in this fleet does (``subject``,
     ``severity``, ``decision``, ``summary``, ``requires_human_review``, ``citations``) so the

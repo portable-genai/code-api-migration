@@ -31,8 +31,8 @@ identity, review_router, repo_scanner, repo_access, ci_status, tracer, evaluatio
   the fixture repo scanner, the hash-chained SQLite WORM audit, the seeded dev personas, the
   review outbox. This is the dev, test and CI default and the working proof that the domain runs
   entirely off-cloud.
-- **`gcp`**: the managed services (Cloud Logging WORM audit, IAP identity, Cloud Trace or the Hrz5
-  OTLP collector, the Hrz4 promotion gate), each importing its SDK LAZILY inside the method so the
+- **`gcp`**: the managed services (Cloud Logging WORM audit, IAP identity, Cloud Trace or the `agent-observability`
+  OTLP collector, the `model-quality-gate` promotion gate), each importing its SDK LAZILY inside the method so the
   other two profiles import the same module tree with no cloud SDK installed.
 - **`onprem`**: fail-fast placeholders that satisfy the same Protocols and RAISE rather than
   pretending. That is the reversibility proof (P-12): a placeholder that returned successfully
@@ -81,7 +81,7 @@ Three things, all named in the repo rather than discovered later:
    listed in `managed_readiness.py`, which refuses API startup on a managed profile while any of
    them is bound. The offline product is complete; the managed one is not.
 2. **Tamper evidence is scoped to what the local sink can prove.** `make portability` says so
-   explicitly. Production tamper evidence is the managed WORM sink's job (**Hrz5**, or the locked
+   explicitly. Production tamper evidence is the managed WORM sink's job (`agent-observability`, or the locked
    Cloud Logging bucket in `infra/terraform/logging_worm.tf`).
 3. **The Terraform stack is not exercised by the offline gate.** `make gate` is deliberately
    offline and credential-free, so the residency posture is reviewed by reading the stack and by

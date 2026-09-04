@@ -8,7 +8,7 @@ this repo still OWES. This FAQ summarises; on any conflict the mapping table win
 ### Is this system deciding anything autonomously?
 
 No. It is decision support. A result carrying any FAIL finding, or a plan blocked by a dependency
-cycle, sets `requires_human_review` AND is routed to the **Hrz7** human-review console through
+cycle, sets `requires_human_review` AND is routed to the `human-review-console` through
 `ReviewRouterPort` in the same call that produced it (rule R8). The flag alone is not the
 escalation, and the managed router REFUSES rather than swallowing an escalation when no console is
 configured. CRITICAL demands two approvals rather than one. Writing back to a repository is a
@@ -32,7 +32,7 @@ payload leaves the process, using the shared `pii-kit` with the jurisdiction sel
 ordering this deployment owns in `domain/pii.py` (`SG`, `HK`, `JP`, `AU`, national rows first).
 The eval gate scores `pii_safety >= 0.99` two independent ways, and
 `tests/unit/test_not_falsely_green.py` proves that metric can go red. The enterprise redaction and
-injection-defence gateway is the sibling **Hrz1** system, which this repo does NOT yet bind
+injection-defence gateway is the sibling `agent-guardrail-gateway` system, which this repo does NOT yet bind
 (COMPLIANCE row R1): bind it before any untrusted text reaches a model.
 
 ### How is the work auditable?
@@ -42,19 +42,19 @@ decision, the severity and the citations. The local trail is append-only, hash-c
 externally ANCHORED, so a truncated tail is detectable rather than invisible; once store and
 anchor disagree the service refuses to append rather than re-anchoring. The managed profile writes
 to a locked, CMEK-encrypted, regional Cloud Logging bucket
-(`infra/terraform/logging_worm.tf`). The enterprise WORM and trace sink is **Hrz5**; binding this
+(`infra/terraform/logging_worm.tf`). The enterprise WORM and trace sink is `agent-observability`; binding this
 repo's audit half to it is still owed (COMPLIANCE row R2), though the tracer already exports OTLP
-to the Hrz5 collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
+to the `agent-observability` collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set.
 
 ### What is the model-risk story when there is no model?
 
 `eval/run_eval.py --mode smoke` runs in the offline gate on every change and scores three metrics
 against a golden set: `detection_accuracy >= 0.80`, `plan_completeness == 1.0` and
 `pii_safety >= 0.99`. It exercises the real `MigrationService` with SDK-free adapters, so it
-measures the shipped engines. `--mode gate` delegates the promotion verdict to the **Hrz4**
+measures the shipped engines. `--mode gate` delegates the promotion verdict to the `model-quality-gate`
 AI-quality authority under the bundle `code-api-migration` and refuses to run off the
 managed profile, because a promotion certified by a laptop is certified by nothing. Registering
-that bundle and its thresholds WITH Hrz4 is still owed (COMPLIANCE rows P-08 and R5). Because no
+that bundle and its thresholds WITH `model-quality-gate` is still owed (COMPLIANCE rows P-08 and R5). Because no
 model produces any output today, there is no model card to file yet, only a boundary: see
 [`../model-card.md`](../model-card.md).
 
@@ -74,10 +74,10 @@ in the offline gate executes it, which is why the residency rows in `COMPLIANCE.
 ### What is still owed?
 
 Read the status column in [`COMPLIANCE.md`](../../COMPLIANCE.md) rather than assuming. As it
-stands the repo owes, among others: grounding through **Hrz2** if retrieval is ever added (P-05),
+stands the repo owes, among others: grounding through `enterprise-knowledge-base` if retrieval is ever added (P-05),
 timeouts, a circuit breaker and documented CPS 230 recovery objectives (P-10), cost and latency
-controls once a model exists (P-11), the **Hrz1** guardrail binding (R1), the **Hrz5** audit
-binding (R2), **Hrz3** registration (R4), **Hrz4** bundle registration (R5), the **Rsk3** intake
+controls once a model exists (P-11), the `agent-guardrail-gateway` binding (R1), the `agent-observability`
+binding (R2), `agent-registry` registration (R4), `model-quality-gate` bundle registration (R5), the `architecture-validator` intake
 reference (R6), and object-level authorisation once this service gains a queryable store.
 [`../practices-audit.md`](../practices-audit.md) records the per-check verdicts, including the
 open B4 item (lift the dual-control threshold into a `policy:` block).

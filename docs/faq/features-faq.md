@@ -37,7 +37,7 @@ were ever added.
 ### Is anything auto-executed? Does it open pull requests by itself?
 
 No. A result carrying any FAIL finding, or a plan blocked by a dependency cycle, sets
-`requires_human_review` AND is routed to the Hrz7 human-review console through
+`requires_human_review` AND is routed to the `human-review-console` through
 `ReviewRouterPort` in the same call that produced it (dependency rule R8): the flag alone is not
 the escalation, and the response carries a `review_ref` so a caller can tell a routed escalation
 from one that stopped locally. CRITICAL demands two approvals rather than one.
@@ -62,13 +62,13 @@ the honest state of each integration is:
 
 | Concern | Owner | State in this repo |
 |---|---|---|
-| Human review and maker-checker console | **Hrz7** | Wired. An adapter in every profile over the shared `review-kit`; the managed router refuses rather than swallowing an escalation with no console configured |
-| AI-quality, eval and promotion gate | **Hrz4** | Client half wired (`eval/run_eval.py --mode gate`, bundle `code-api-migration`). Registering the bundle and its thresholds with Hrz4 is still owed |
-| Observability, tracing, immutable audit, FinOps | **Hrz5** | Tracing half wired (OTLP to the Hrz5 collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set). The audit trail is local and tamper-evident; binding it to the shared sink is still owed |
-| Agent registry, versioning, entitlements | **Hrz3** | The A2A card is served at `/.well-known/agent-card.json`, built from the same tool table the runtime binds. Registering it with Hrz3 is still owed |
-| Runtime guardrail: prompt-injection defence, output filtering | **Hrz1** | Not wired. There is no guardrail port, because there is no model boundary to screen yet |
-| Governed RAG knowledge base with citations | **Hrz2** | Not used. The rule packs are the grounding; a fork that grounds findings in live changelogs or vendor API specs must integrate Hrz2 |
-| Architecture and requirements intake validation | **Rsk3** | Not a code control. Rule R6 is an intake action; the validation reference is recorded in `COMPLIANCE.md` when the project passes |
+| Human review and maker-checker console | `human-review-console` | Wired. An adapter in every profile over the shared `review-kit`; the managed router refuses rather than swallowing an escalation with no console configured |
+| AI-quality, eval and promotion gate | `model-quality-gate` | Client half wired (`eval/run_eval.py --mode gate`, bundle `code-api-migration`). Registering the bundle and its thresholds with `model-quality-gate` is still owed |
+| Observability, tracing, immutable audit, FinOps | `agent-observability` | Tracing half wired (OTLP to the `agent-observability` collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set). The audit trail is local and tamper-evident; binding it to the shared sink is still owed |
+| Agent registry, versioning, entitlements | `agent-registry` | The A2A card is served at `/.well-known/agent-card.json`, built from the same tool table the runtime binds. Registering it with `agent-registry` is still owed |
+| Runtime guardrail: prompt-injection defence, output filtering | `agent-guardrail-gateway` | Not wired. There is no guardrail port, because there is no model boundary to screen yet |
+| Governed RAG knowledge base with citations | `enterprise-knowledge-base` | Not used. The rule packs are the grounding; a fork that grounds findings in live changelogs or vendor API specs must integrate `enterprise-knowledge-base` |
+| Architecture and requirements intake validation | `architecture-validator` | Not a code control. Rule R6 is an intake action; the validation reference is recorded in `COMPLIANCE.md` when the project passes |
 
 So the review console, the promotion authority, the shared audit sink, the registry and the
 guardrail are *dependencies*, not features of this repo. The authority for each row is the R1 to

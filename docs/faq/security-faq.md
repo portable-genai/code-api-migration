@@ -85,7 +85,7 @@ only the anchor catches a TRUNCATED TAIL, because a shorter chain still verifies
 store and anchor disagree the service refuses to append rather than re-anchoring, so an ordinary
 write cannot launder a divergence. `tests/unit/test_audit_anchor.py` proves the detection, proves
 the control case goes undetected without an anchor, and proves the refusal. The enterprise WORM
-store is **Hrz5**; the in-repo chain is the offline stand-in, and the managed profile writes to a
+store is `agent-observability`; the in-repo chain is the offline stand-in, and the managed profile writes to a
 locked Cloud Logging bucket instead (`infra/terraform/logging_worm.tf`).
 
 ## Is the domain really dependency-free?
@@ -101,10 +101,10 @@ unqualified pure-stdlib claim.
 
 ## What is explicitly out of scope for this repo?
 
-The prompt-injection and output-filtering guardrail (**Hrz1**, not wired: there is no model
-boundary to screen yet), the governed knowledge base (**Hrz2**), the agent registry (**Hrz3**,
-the card is published but registration is owed), the AI-quality and promotion gate (**Hrz4**, the
-client half only), the shared WORM audit and trace sink (**Hrz5**, tracing only), and the
-human-review console (**Hrz7**, wired). This repo integrates those rather than re-implementing
+The prompt-injection and output-filtering guardrail (`agent-guardrail-gateway`, not wired: there is no model
+boundary to screen yet), the governed knowledge base (`enterprise-knowledge-base`), the agent registry (`agent-registry`,
+the card is published but registration is owed), the AI-quality and promotion gate (`model-quality-gate`, the
+client half only), the shared WORM audit and trace sink (`agent-observability`, tracing only), and the
+human-review console (`human-review-console`, wired). This repo integrates those rather than re-implementing
 them. See [features-faq.md](features-faq.md) for the full boundary map and
 [compliance-faq.md](compliance-faq.md) for what is still owed.

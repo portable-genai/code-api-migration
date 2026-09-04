@@ -143,13 +143,13 @@ wired in this tree today, and what is honestly not (the authority is the R1 to R
 
 | Concern | Owner | Wired here? |
 |---|---|---|
-| Human review and maker-checker console | **Hrz7** | **Yes.** `ports/review_router.py` with an adapter in every family, over the shared `review-kit`. Set `HUMAN_REVIEW_URL`; the managed router REFUSES rather than swallowing an escalation when it is empty. |
-| AI-quality and promotion gate | **Hrz4** | **Client half only.** `adapters/gcp/evaluation.py` asks the Hrz4 authority (`CODEMIGRATION_QUALITY_URL`) under bundle `code-api-migration` and refuses to run off the managed profile. You must still REGISTER that bundle and its thresholds with Hrz4, or gate mode has no authority to ask. |
-| Observability, tracing and immutable audit | **Hrz5** | **Tracing half only.** `adapters/gcp/tracer.py` exports OTLP to the Hrz5 collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. The audit trail is local and tamper-evident (hash chain plus external anchor); binding it to the shared sink is still open. |
-| Agent registry, identity and entitlements | **Hrz3** | **Card only.** The A2A card is served at `/.well-known/agent-card.json` and built from the same tool table the runtime binds. Registering it with Hrz3 and taking entitlements from it is yours. |
-| Runtime guardrail: prompt-injection defence, output filtering | **Hrz1** | **No.** There is no `GuardrailPort` in this tree. Bind one before any untrusted text reaches a model. |
-| Governed RAG knowledge base | **Hrz2** | **No, and not needed today.** There is no retrieval port; the rule packs are the grounding. A fork that grounds findings in live changelogs or API specs must integrate Hrz2 and make empty retrieval a hard error. |
-| Architecture and requirements intake validation | **Rsk3** | **No.** Rule R6 is an intake action rather than a code control; record the validation reference in `COMPLIANCE.md` when the project passes. |
+| Human review and maker-checker console | `human-review-console` | **Yes.** `ports/review_router.py` with an adapter in every family, over the shared `review-kit`. Set `HUMAN_REVIEW_URL`; the managed router REFUSES rather than swallowing an escalation when it is empty. |
+| AI-quality and promotion gate | `model-quality-gate` | **Client half only.** `adapters/gcp/evaluation.py` asks the `model-quality-gate` authority (`CODEMIGRATION_QUALITY_URL`) under bundle `code-api-migration` and refuses to run off the managed profile. You must still REGISTER that bundle and its thresholds with `model-quality-gate`, or gate mode has no authority to ask. |
+| Observability, tracing and immutable audit | `agent-observability` | **Tracing half only.** `adapters/gcp/tracer.py` exports OTLP to the `agent-observability` collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. The audit trail is local and tamper-evident (hash chain plus external anchor); binding it to the shared sink is still open. |
+| Agent registry, identity and entitlements | `agent-registry` | **Card only.** The A2A card is served at `/.well-known/agent-card.json` and built from the same tool table the runtime binds. Registering it with `agent-registry` and taking entitlements from it is yours. |
+| Runtime guardrail: prompt-injection defence, output filtering | `agent-guardrail-gateway` | **No.** There is no `GuardrailPort` in this tree. Bind one before any untrusted text reaches a model. |
+| Governed RAG knowledge base | `enterprise-knowledge-base` | **No, and not needed today.** There is no retrieval port; the rule packs are the grounding. A fork that grounds findings in live changelogs or API specs must integrate `enterprise-knowledge-base` and make empty retrieval a hard error. |
+| Architecture and requirements intake validation | `architecture-validator` | **No.** Rule R6 is an intake action rather than a code control; record the validation reference in `COMPLIANCE.md` when the project passes. |
 
 So the review console, the promotion authority, the shared audit sink, the registry and the
 guardrail are *dependencies*, not features of this repo. Decide for each whether you integrate it
@@ -165,5 +165,5 @@ or stub it, and record the decision.
 - [ ] Replaced every fixture checkout under `fixtures/repos/` with your own synthetic ones.
 - [ ] Rebuilt `eval/datasets/golden_cases.jsonl` for your packs.
 - [ ] Reviewed the deploy posture (Dockerfile, the Terraform stack, the bind address) and emptied `managed_readiness.py` honestly.
-- [ ] Wired your Hrz7 endpoint and decided which sibling systems you integrate vs stub.
+- [ ] Wired your `human-review-console` endpoint and decided which sibling systems you integrate vs stub.
 - [ ] Recorded your baseline upstream tag so you can take future fixes.

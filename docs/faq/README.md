@@ -14,8 +14,8 @@ one that matches your role.
 | [compliance-faq.md](compliance-faq.md) | Compliance, model risk and second line | maker-checker, PII posture, auditability, the eval gate, deploy-time residency, and what is still owed |
 
 These FAQs deliberately do **not** re-document capabilities owned by sibling systems in the GRC
-catalog. Where a concern belongs to another repo (the guardrail gateway Hrz1, the governed
-knowledge base Hrz2, the agent registry Hrz3, the AI-quality gate Hrz4, observability and the
-shared WORM audit sink Hrz5, the human-review console Hrz7), the FAQ points at it and explains
+catalog. Where a concern belongs to another repo (the guardrail gateway `agent-guardrail-gateway`, the governed
+knowledge base `enterprise-knowledge-base`, the agent registry `agent-registry`, the AI-quality gate `model-quality-gate`, observability and the
+shared WORM audit sink `agent-observability`, the human-review console `human-review-console`), the FAQ points at it and explains
 the boundary rather than duplicating it. See [features-faq.md](features-faq.md) for the full
 "what this repo owns vs what it integrates" map.

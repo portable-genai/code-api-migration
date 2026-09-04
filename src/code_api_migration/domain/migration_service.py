@@ -11,7 +11,7 @@ carrying any FAIL finding (or a plan blocked by a dependency cycle) sets ``requi
 and never auto-executes; a clean checkout does not manufacture a review. PII is redacted BEFORE
 the audit write (commit metadata such as author emails crosses this path when a changelog is
 summarised), every result carries the plan's citations, and the caller routes an escalation to
-Hrz7 through the review port (rule R8).
+human-review-console through the review port (rule R8).
 """
 
 from __future__ import annotations

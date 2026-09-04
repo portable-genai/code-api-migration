@@ -64,7 +64,7 @@ behavioural suites cannot quietly assert different things.
 scan the target repo (fixture under `local`) -> pure analysis (AST facts -> dependency topology
 -> breaking-change pack evaluation -> ordered plan) -> redact-before-audit (P-04) -> deterministic
 overall severity band -> soft escalation when changes are proposed (P-06) -> already redacted WORM
-audit write -> **route the escalation to Hrz7 (R8)**. The audit actor and the review maker are
+audit write -> **route the escalation to `human-review-console` (R8)**. The audit actor and the review maker are
 both the verified `Principal`, never the request body. Every finding, verdict and step is computed
 by the pure engines; the model narrates only. Routing happens in the same request that produced
 the result, on the API and CLI surfaces alike, so an escalation never depends on a later job.
@@ -74,7 +74,7 @@ the result, on the API and CLI surfaces alike, so an escalation never depends on
 |---|---|---|---|
 | `AuditSinkPort` | hash-chained SQLite WORM (commons) | Cloud Logging WORM (lazy) | placeholder |
 | `IdentityPort` | seeded personas (commons) | IAP assertion (lazy) | placeholder |
-| `ReviewRouterPort` | review-kit outbox (offline, inspectable) | Hrz7 service intake over S2S | placeholder |
+| `ReviewRouterPort` | review-kit outbox (offline, inspectable) | `human-review-console` service intake over S2S | placeholder |
 
 The on-prem placeholders RAISE. A review router that silently returned would convert every
 consequential result into an unreviewed one, which is worse than a missing feature.
