@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Literal
+
 from pydantic import BaseModel
 
 from ..domain.models import MigrationPlan, MigrationResult
@@ -52,10 +54,12 @@ class MigrationResponse(BaseModel):
     #: to see repo metadata). The agent tool, whose output reaches a model, masks it instead.
     provenance: str = ""
     #: Where the escalation WENT (rule R8): the human-review-console review id, or the local queue
-    #: reference.
-    #: Empty only when the result did not escalate. A caller can tell a routed escalation from a
-    #: flag that stopped here, which is the whole point of the rule.
+    #: reference. Empty exactly when ``review_routing`` is not ``routed``, so a caller can tell a
+    #: routed escalation from a flag that stopped here, which is the whole point of the rule.
     review_ref: str = ""
+    #: What happened to the hand-off: routed, failed, off or not_required. ``failed`` means the
+    #: result is NOT queued for review, and the console says so.
+    review_routing: Literal["routed", "failed", "off", "not_required"] = "not_required"
     citations: list[CitationModel] = []
     steps: list[PlanStepModel] = []
     findings: list[FindingModel] = []
@@ -67,6 +71,7 @@ class MigrationResponse(BaseModel):
         plan: MigrationPlan,
         *,
         review_ref: str = "",
+        review_routing: str = "not_required",
     ) -> MigrationResponse:
         return cls(
             subject=result.subject,
@@ -81,6 +86,7 @@ class MigrationResponse(BaseModel):
             blocked=result.blocked,
             provenance=result.provenance,
             review_ref=review_ref,
+            review_routing=review_routing,  # type: ignore[arg-type]
             citations=[
                 CitationModel(source_id=c.source_id, title=c.title, snippet=c.snippet)
                 for c in result.citations

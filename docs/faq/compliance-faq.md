@@ -10,8 +10,10 @@ this repo still OWES. This FAQ summarises; on any conflict the mapping table win
 No. It is decision support. A result carrying any FAIL finding, or a plan blocked by a dependency
 cycle, sets `requires_human_review` AND is routed to the `human-review-console` through
 `ReviewRouterPort` in the same call that produced it (rule R8). The flag alone is not the
-escalation, and the managed router REFUSES rather than swallowing an escalation when no console is
-configured. CRITICAL demands two approvals rather than one. Writing back to a repository is a
+escalation. Under the managed profile the service refuses to boot with routing on and no console
+configured, and a hand-off that fails at request time is reported as `review_routing: "failed"`
+and logged rather than swallowed; `CODEMIGRATION_REVIEW_ROUTING=off` is the stated way to run
+without routing. CRITICAL demands two approvals rather than one. Writing back to a repository is a
 separate, consequential act behind `RepoAccessPort`, reserved for an approved review.
 
 ### How is the consequential decision explainable?

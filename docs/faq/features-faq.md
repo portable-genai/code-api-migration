@@ -39,8 +39,9 @@ were ever added.
 No. A result carrying any FAIL finding, or a plan blocked by a dependency cycle, sets
 `requires_human_review` AND is routed to the `human-review-console` through
 `ReviewRouterPort` in the same call that produced it (dependency rule R8): the flag alone is not
-the escalation, and the response carries a `review_ref` so a caller can tell a routed escalation
-from one that stopped locally. CRITICAL demands two approvals rather than one.
+the escalation, and the response carries a `review_ref` and a `review_routing` value (`routed`,
+`failed`, `off`, `not_required`) so a caller can tell a routed escalation from one that stopped
+locally. CRITICAL demands two approvals rather than one.
 
 Writing back to a target repository is the one consequential mutation, and it lives behind
 `RepoAccessPort` as a separate, deliberate act: no shipped surface calls `open_pull_request`
@@ -62,7 +63,7 @@ the honest state of each integration is:
 
 | Concern | Owner | State in this repo |
 |---|---|---|
-| Human review and maker-checker console | `human-review-console` | Wired. An adapter in every profile over the shared `review-kit`; the managed router refuses rather than swallowing an escalation with no console configured |
+| Human review and maker-checker console | `human-review-console` | Wired. An adapter in every profile over the shared `review-kit`; the managed profile refuses to boot with routing on and no console configured, and a failed hand-off is reported as `review_routing: "failed"` |
 | AI-quality, eval and promotion gate | `model-quality-gate` | Client half wired (`eval/run_eval.py --mode gate`, bundle `code-api-migration`). Registering the bundle and its thresholds with `model-quality-gate` is still owed |
 | Observability, tracing, immutable audit, FinOps | `agent-observability` | Tracing half wired (OTLP to the `agent-observability` collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set). The audit trail is local and tamper-evident; binding it to the shared sink is still owed |
 | Agent registry, versioning, entitlements | `agent-registry` | The A2A card is served at `/.well-known/agent-card.json`, built from the same tool table the runtime binds. Registering it with `agent-registry` is still owed |
