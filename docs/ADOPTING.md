@@ -143,7 +143,7 @@ wired in this tree today, and what is honestly not (the authority is the R1 to R
 
 | Concern | Owner | Wired here? |
 |---|---|---|
-| Human review and maker-checker console | `human-review-console` | **Yes.** `ports/review_router.py` with an adapter in every family, over the shared `review-kit`. Set `HUMAN_REVIEW_URL`; the managed router REFUSES rather than swallowing an escalation when it is empty. |
+| Human review and maker-checker console | `human-review-console` | **Yes.** `ports/review_router.py` with an adapter in every family, over the shared `review-kit`. Set `HUMAN_REVIEW_URL`; with routing on and it empty, the managed profile REFUSES TO BOOT. `CODEMIGRATION_REVIEW_ROUTING=off` is the stated way to run without routing. |
 | AI-quality and promotion gate | `model-quality-gate` | **Client half only.** `adapters/gcp/evaluation.py` asks the `model-quality-gate` authority (`CODEMIGRATION_QUALITY_URL`) under bundle `code-api-migration` and refuses to run off the managed profile. You must still REGISTER that bundle and its thresholds with `model-quality-gate`, or gate mode has no authority to ask. |
 | Observability, tracing and immutable audit | `agent-observability` | **Tracing half only.** `adapters/gcp/tracer.py` exports OTLP to the `agent-observability` collector when `OTEL_EXPORTER_OTLP_ENDPOINT` is set. The audit trail is local and tamper-evident (hash chain plus external anchor); binding it to the shared sink is still open. |
 | Agent registry, identity and entitlements | `agent-registry` | **Card only.** The A2A card is served at `/.well-known/agent-card.json` and built from the same tool table the runtime binds. Registering it with `agent-registry` and taking entitlements from it is yours. |
