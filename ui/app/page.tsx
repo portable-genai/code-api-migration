@@ -28,6 +28,15 @@ function reviewRoutingOf(body: string): string | undefined {
   }
 }
 
+// The fictional target repositories the local profile's scanner serves, one per bundled fixture
+// under fixtures/repos/*/repo.yaml. The API has no list route, and an id the scanner does not know
+// is refused, so the console offers exactly these rather than a free-text field.
+const REPOS = [
+  { id: "legacy-flask-app", note: "legacy Flask 1.x app with breaking changes to plan" },
+  { id: "tangled-service", note: "cyclic modules, so no sound migration order exists" },
+  { id: "tidy-app", note: "already migrated, nothing to change" },
+];
+
 interface CardSummary {
   name?: string;
   description?: string;
@@ -36,8 +45,7 @@ interface CardSummary {
 
 export default function Home() {
   const [persona, setPersona] = useState(PERSONAS[0]);
-  const [subject, setSubject] = useState("Acme Holdings (FICTIONAL)");
-  const [text, setText] = useState("urgent data breach reported by the branch");
+  const [repoId, setRepoId] = useState(REPOS[0].id);
   const [result, setResult] = useState("");
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -62,10 +70,12 @@ export default function Home() {
     setBusy(true);
     setFailed(false);
     try {
-      const response = await fetch(API + "/v1/triage", {
+      // The repo id is the whole of `MigrationRequestModel`: the scanner resolves it to a
+      // checkout and the engines produce every finding, verdict and step from that.
+      const response = await fetch(API + "/v1/migrations", {
         method: "POST",
         headers: { "Content-Type": "application/json", "X-Dev-Persona": persona },
-        body: JSON.stringify({ subject, text }),
+        body: JSON.stringify({ repo_id: repoId }),
       });
       const body = await response.text();
       setFailed(!response.ok);
@@ -83,7 +93,7 @@ export default function Home() {
       <h1>{card?.name ?? "Agent console"}</h1>
       <p className="sub">
         {card?.description ??
-          "Submit a case. The decision is deterministic, cited, and routed to a human reviewer when it escalates."}
+          "Analyse a repository into a migration plan. The plan is deterministic, cited, and routed to a human reviewer when it escalates."}
       </p>
 
       <form onSubmit={submit}>
@@ -102,17 +112,19 @@ export default function Home() {
         </fieldset>
 
         <fieldset>
-          <legend>The case</legend>
+          <legend>The target repository</legend>
           <label>
-            Subject
-            <input value={subject} onChange={(event) => setSubject(event.target.value)} />
+            Repository (fictional fixture served by the local profile)
+            <select value={repoId} onChange={(event) => setRepoId(event.target.value)}>
+              {REPOS.map((repo) => (
+                <option key={repo.id} value={repo.id}>
+                  {repo.id}: {repo.note}
+                </option>
+              ))}
+            </select>
           </label>
-          <label>
-            Description
-            <textarea value={text} onChange={(event) => setText(event.target.value)} />
-          </label>
-          <button type="submit" disabled={busy}>
-            {busy ? "Working" : "Triage this case"}
+          <button type="submit" disabled={busy || !repoId}>
+            {busy ? "Working" : "Plan this migration"}
           </button>
         </fieldset>
       </form>
